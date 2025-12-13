@@ -9,6 +9,10 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,28 +64,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ),
         new SysIdRoutine.Mechanism(
             output -> setControl(m_translationCharacterization.withVolts(output)),
-            this::log,
+            null,
             this
         )
     );
-
-    public void log(SysIdRoutineLog log){
-        log.motor("Front-Left").angularPosition(getModule(0).getDriveMotor().getPosition().getValue());
-        log.motor("Front-Left").angularVelocity((getModule(0).getDriveMotor().getVelocity().getValue()));
-        log.motor("Front-Left").voltage((getModule(0).getDriveMotor().getMotorVoltage().getValue()));
-
-        log.motor("Front-Right").angularPosition(getModule(1).getDriveMotor().getPosition().getValue());
-        log.motor("Front-Right").angularVelocity((getModule(1).getDriveMotor().getVelocity().getValue()));
-        log.motor("Front-Right").voltage((getModule(1).getDriveMotor().getMotorVoltage().getValue()));
-
-        log.motor("Back-Left").angularPosition(getModule(2).getDriveMotor().getPosition().getValue());
-        log.motor("Back-Left").angularVelocity((getModule(2).getDriveMotor().getVelocity().getValue()));
-        log.motor("Back-Left").voltage((getModule(2).getDriveMotor().getMotorVoltage().getValue()));
-
-        log.motor("Back-Right").angularPosition(getModule(3).getDriveMotor().getPosition().getValue());
-        log.motor("Back-Right").angularVelocity((getModule(3).getDriveMotor().getVelocity().getValue()));
-        log.motor("Back-Right").voltage((getModule(3).getDriveMotor().getMotorVoltage().getValue()));
-    }
 
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
@@ -94,7 +80,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ),
         new SysIdRoutine.Mechanism(
             volts -> setControl(m_steerCharacterization.withVolts(volts)),
-            this::log,
+            null,
             this
         )
     );
@@ -121,7 +107,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 /* also log the requested output for SysId */
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             },
-            this::log,
+            null,
             this
         )
     );
@@ -203,7 +189,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
-    }
+
+            //     //PATHPLANNER
+            //     // Load the RobotConfig from the GUI settings. You should probably
+            // // store this in your Constants file
+            // RobotConfig config;
+            // try{
+            //     config = RobotConfig.fromGUISettings();
+            // } catch (Exception e) {
+            //     // Handle exception as needed
+            //     e.printStackTrace();
+            // }
+
+            // // Configure AutoBuilder last
+            // AutoBuilder.configure(
+            //         this:getPose, // Robot pose supplier
+            //         this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+            //         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            //         (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            //         new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+            //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            //                 new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            //         ),
+            //         config, // The robot configuration
+            //         () -> {
+            //             // Boolean supplier that controls when the path will be mirrored for the red alliance
+            //             // This will flip the path being followed to the red side of the field.
+            //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+            //             var alliance = DriverStation.getAlliance();
+            //             if (alliance.isPresent()) {
+            //             return alliance.get() == DriverStation.Alliance.Red;
+            //             }
+            //             return false;
+            //         },
+            //         this // Reference to this subsystem to set requirements
+            // );
+            }
 
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
