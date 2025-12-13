@@ -51,7 +51,41 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
+    private final SwerveRequest.ApplyRobotSpeeds driveRobotRelative = new SwerveRequest.ApplyRobotSpeeds();
 
+    /**
+     * Constructs a CTRE SwerveDrivetrain using the specified constants.
+     * <p>
+     * This constructs the underlying hardware devices, so users should not construct
+     * the devices themselves. If they need the devices, they can access them through
+     * getters in the classes.
+     *
+     * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
+     * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
+     *                                  unspecified or set to 0 Hz, this is 250 Hz on
+     *                                  CAN FD, and 100 Hz on CAN 2.0.
+     * @param odometryStandardDeviation The standard deviation for odometry calculation
+     *                                  in the form [x, y, theta]ᵀ, with units in meters
+     *                                  and radians
+     * @param visionStandardDeviation   The standard deviation for vision calculation
+     *                                  in the form [x, y, theta]ᵀ, with units in meters
+     *                                  and radians
+     * @param modules                   Constants for each specific module
+     */
+    public CommandSwerveDrivetrain(
+        SwerveDrivetrainConstants drivetrainConstants,
+        double odometryUpdateFrequency,
+        Matrix<N3, N1> odometryStandardDeviation,
+        Matrix<N3, N1> visionStandardDeviation,
+        SwerveModuleConstants<?, ?, ?>... modules
+    ) {
+        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
+        if (Utils.isSimulation()) {
+            startSimThread();
+        }
+
+        configurePathPlanner();
+    }
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
@@ -133,6 +167,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        configurePathPlanner();
     }
 
     /**
@@ -157,75 +192,51 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        configurePathPlanner();
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
-     *                                  unspecified or set to 0 Hz, this is 250 Hz on
-     *                                  CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation The standard deviation for odometry calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param modules                   Constants for each specific module
-     */
-    public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        double odometryUpdateFrequency,
-        Matrix<N3, N1> odometryStandardDeviation,
-        Matrix<N3, N1> visionStandardDeviation,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
-        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
+    private void configurePathPlanner() {
+        //PATHPLANNER
+        // Load the RobotConfig from the GUI settings. You should probably
+        // store this in your Constants file
+        RobotConfig config;
+        try{
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            // Handle exception as needed
+            e.printStackTrace();
+            return;
         }
 
-            //     //PATHPLANNER
-            //     // Load the RobotConfig from the GUI settings. You should probably
-            // // store this in your Constants file
-            // RobotConfig config;
-            // try{
-            //     config = RobotConfig.fromGUISettings();
-            // } catch (Exception e) {
-            //     // Handle exception as needed
-            //     e.printStackTrace();
-            // }
+        
 
-            // // Configure AutoBuilder last
-            // AutoBuilder.configure(
-            //         this:getPose, // Robot pose supplier
-            //         this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            //         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            //         (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            //         new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-            //                 new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            //                 new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            //         ),
-            //         config, // The robot configuration
-            //         () -> {
-            //             // Boolean supplier that controls when the path will be mirrored for the red alliance
-            //             // This will flip the path being followed to the red side of the field.
-            //             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+        // Configure AutoBuilder last
+        AutoBuilder.configure(
+                () -> getState().Pose, // Robot pose supplier
+                this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+                () -> getState().Speeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> setControl(driveRobotRelative.withSpeeds(speeds)), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                ),
+                config, // The robot configuration
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red alliance
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-            //             var alliance = DriverStation.getAlliance();
-            //             if (alliance.isPresent()) {
-            //             return alliance.get() == DriverStation.Alliance.Red;
-            //             }
-            //             return false;
-            //         },
-            //         this // Reference to this subsystem to set requirements
-            // );
-            }
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+        );
+    }
+
+
 
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
