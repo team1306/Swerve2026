@@ -17,6 +17,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,6 +47,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
+
+
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -57,10 +60,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ),
         new SysIdRoutine.Mechanism(
             output -> setControl(m_translationCharacterization.withVolts(output)),
-            null,
+            this::log,
             this
         )
     );
+
+    public void log(SysIdRoutineLog log){
+        log.motor("Front-Left").angularPosition(getModule(0).getDriveMotor().getPosition().getValue());
+        log.motor("Front-Left").angularVelocity((getModule(0).getDriveMotor().getVelocity().getValue()));
+        log.motor("Front-Left").voltage((getModule(0).getDriveMotor().getMotorVoltage().getValue()));
+
+        log.motor("Front-Right").angularPosition(getModule(1).getDriveMotor().getPosition().getValue());
+        log.motor("Front-Right").angularVelocity((getModule(1).getDriveMotor().getVelocity().getValue()));
+        log.motor("Front-Right").voltage((getModule(1).getDriveMotor().getMotorVoltage().getValue()));
+
+        log.motor("Back-Left").angularPosition(getModule(2).getDriveMotor().getPosition().getValue());
+        log.motor("Back-Left").angularVelocity((getModule(2).getDriveMotor().getVelocity().getValue()));
+        log.motor("Back-Left").voltage((getModule(2).getDriveMotor().getMotorVoltage().getValue()));
+
+        log.motor("Back-Right").angularPosition(getModule(3).getDriveMotor().getPosition().getValue());
+        log.motor("Back-Right").angularVelocity((getModule(3).getDriveMotor().getVelocity().getValue()));
+        log.motor("Back-Right").voltage((getModule(3).getDriveMotor().getMotorVoltage().getValue()));
+    }
 
     /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
@@ -73,7 +94,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         ),
         new SysIdRoutine.Mechanism(
             volts -> setControl(m_steerCharacterization.withVolts(volts)),
-            null,
+            this::log,
             this
         )
     );
@@ -100,7 +121,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 /* also log the requested output for SysId */
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             },
-            null,
+            this::log,
             this
         )
     );
