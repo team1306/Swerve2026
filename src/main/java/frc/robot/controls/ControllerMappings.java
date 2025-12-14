@@ -37,8 +37,8 @@ public class ControllerMappings {
 
         drivetrain.setDefaultCommand(controls.getDrivetrainFieldCentricCommand());
 
-        driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        driverController.a().whileTrue(drivetrain.applyRequest(() -> controls.brake));
+        driverController.leftBumper(eventLoop).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        driverController.a(eventLoop).whileTrue(drivetrain.applyRequest(() -> controls.brake));
 
         CommandScheduler.getInstance().setActiveButtonLoop(eventLoop);
     }
@@ -50,19 +50,19 @@ public class ControllerMappings {
 
         drivetrain.setDefaultCommand(controls.getDrivetrainFieldCentricCommand());
         
-        driverController.a().whileTrue(drivetrain.applyRequest(() -> controls.brake));
-        driverController.b().whileTrue(drivetrain.applyRequest(() ->
+        driverController.a(eventLoop).whileTrue(drivetrain.applyRequest(() -> controls.brake));
+        driverController.b(eventLoop).whileTrue(drivetrain.applyRequest(() ->
                 controls.point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
         ));
 
-        driverController.start().and(driverController.a()).onTrue(new InstantCommand(SignalLogger::start));
-        driverController.back().and(driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        driverController.start().and(driverController.b()).onTrue(new InstantCommand(SignalLogger::stop));
+        driverController.start(eventLoop).and(driverController.a(eventLoop)).onTrue(new InstantCommand(SignalLogger::start));
+        driverController.back(eventLoop).and(driverController.y(eventLoop)).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driverController.back(eventLoop).and(driverController.x(eventLoop)).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driverController.start(eventLoop).and(driverController.y(eventLoop)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driverController.start(eventLoop).and(driverController.x(eventLoop)).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        driverController.start(eventLoop).and(driverController.b(eventLoop)).onTrue(new InstantCommand(SignalLogger::stop));
 
-        driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        driverController.leftBumper(eventLoop).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         CommandScheduler.getInstance().setActiveButtonLoop(eventLoop);
     }
