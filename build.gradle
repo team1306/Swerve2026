@@ -1,6 +1,8 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
+    id 'io.freefair.aspectj.post-compile-weaving' version '8.14'
+    id("io.freefair.lombok") version "8.12.2.1"
 }
 
 java {
@@ -72,6 +74,10 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.aspectj:aspectjrt:1.9.24'
+    aspect 'com.github.team1306:badger-log:2025.4.2'
+    annotationProcessor 'com.github.team1306:badger-log:2025.4.2'
 }
 
 test {
