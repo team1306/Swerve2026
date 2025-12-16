@@ -1,14 +1,14 @@
 package frc.robot.controls;
 
 import badgerlog.BadgerLog;
-import badgerutils.statemachine.Edges;
-import badgerutils.statemachine.StateMachine;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+
+import java.util.EnumMap;
 
 import static frc.robot.subsystems.CommandSwerveDrivetrain.MaxAngularRate;
 import static frc.robot.subsystems.CommandSwerveDrivetrain.MaxSpeed;
@@ -34,7 +34,7 @@ public class Controls {
 
     //============================== CONTROLLER STATE ==============================
 
-    private final StateMachine<ControlStates> stateMachine;
+    private final EnumMap<ControlStates, Runnable> states = new EnumMap<>(ControlStates.class);
     private final ControllerMappings mappings;
     
     public Controls(CommandSwerveDrivetrain drivetrain) {
@@ -48,16 +48,14 @@ public class Controls {
 
         mappings.bindDefaultControls();
         
-        Edges<ControlStates> edges = new Edges<>();
-        edges.anyToState(ControlStates.DEFAULT, transition -> mappings.bindDefaultControls());
-        edges.anyToState(ControlStates.SWERVE_TESTING, transition -> mappings.bindSwerveTestingControls());
-        
-        stateMachine = new StateMachine<>(ControlStates.DEFAULT, edges);
+        states.put(ControlStates.DEFAULT, mappings::bindDefaultControls);
+        states.put(ControlStates.SWERVE_TESTING, mappings::bindSwerveTestingControls);
+
         BadgerLog.createSelectorFromEnum(
                 "Controls/Controller Mode", 
                 ControlStates.class, 
-                ControlStates.DEFAULT, 
-                value -> stateMachine.tryChangeState((ControlStates) value));
+                ControlStates.DEFAULT,
+                value -> states.get((ControlStates) value).run());
     }
     
     public Command getDrivetrainFieldCentricCommand() {

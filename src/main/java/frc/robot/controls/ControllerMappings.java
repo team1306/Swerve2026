@@ -61,7 +61,7 @@ public class ControllerMappings {
     }
 
     public void bindCommonControls() {
-        RobotModeTriggers.disabled().whileTrue(drivetrain.applyRequest(() -> controls.idle).ignoringDisable(true));
+        RobotModeTriggers.disabled().whileTrue(controls.getDrivetrainIdleCommand());
     }
 
     public void clearAllPreviousControls(){
