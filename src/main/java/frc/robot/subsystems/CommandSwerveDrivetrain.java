@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import badgerutils.triggers.AllianceTriggers;
@@ -26,7 +25,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -131,7 +129,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // drives robot with robot relative speeds
         BiConsumer<ChassisSpeeds, DriveFeedforwards> driveConsumer =  (speeds, feedforwards) -> setControl(driveRobotRelative.withSpeeds(speeds));
         
-        PIDConstants translationConstants = new PIDConstants(5, 0, 0);
+        PIDConstants translationConstants = new PIDConstants(10, 0, 0);
         PIDConstants rotationConstants = new PIDConstants(5, 0, 0);
 
         PPHolonomicDriveController autoController = new PPHolonomicDriveController(translationConstants, rotationConstants);
@@ -268,7 +266,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     );
 
     /* The SysId routine to test */
-    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+    private final SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineSteer;
     
     /**
      * Runs the SysId Quasistatic test in the given direction for the routine

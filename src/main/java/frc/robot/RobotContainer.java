@@ -10,7 +10,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.controls.Controls;
 import frc.robot.generated.TunerConstants;
@@ -29,7 +28,7 @@ public class RobotContainer {
         controls = new Controls(drivetrain);
         configureBindings();
         
-        SignalLogger.enableAutoLogging(false);
+        SignalLogger.enableAutoLogging(true);
     }
 
     private void configureBindings() {
@@ -37,6 +36,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("Curve Back");
+        return new PathPlannerAuto("Straight and Back 3m");
     }
 }
