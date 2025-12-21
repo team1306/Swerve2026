@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import badgerutils.triggers.AllianceTriggers;
@@ -26,7 +25,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -131,6 +129,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // drives robot with robot relative speeds
         BiConsumer<ChassisSpeeds, DriveFeedforwards> driveConsumer =  (speeds, feedforwards) -> setControl(driveRobotRelative.withSpeeds(speeds));
         
+        //TODO, check if changing the PID to (20, 0, 0.2) works
         PIDConstants translationConstants = new PIDConstants(5, 0, 0);
         PIDConstants rotationConstants = new PIDConstants(5, 0, 0);
 
