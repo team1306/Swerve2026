@@ -40,7 +40,7 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
     public static final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    public static final double MaxAngularRate = RotationsPerSecond.of(0.75)
+    public static final double MaxAngularRate = RotationsPerSecond.of(1.25)
             .in(RadiansPerSecond);
 
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -149,7 +149,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         return run(() -> this.setControl(requestSupplier.get()));
     }
-
     
 
     @Override

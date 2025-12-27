@@ -18,8 +18,8 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    // SignalLogger.enableAutoLogging(false);
-    // SignalLogger.stop();
+    SignalLogger.enableAutoLogging(false);
+    SignalLogger.stop();
   }
 
   @Override

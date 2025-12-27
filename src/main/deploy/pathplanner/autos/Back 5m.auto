@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Straight 3m"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Back 3m"
+            "pathName": "Back 5m"
           }
         }
       ]
