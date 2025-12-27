@@ -129,7 +129,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // drives robot with robot relative speeds
         BiConsumer<ChassisSpeeds, DriveFeedforwards> driveConsumer =  (speeds, feedforwards) -> setControl(driveRobotRelative.withSpeeds(speeds));
         
-        PIDConstants translationConstants = new PIDConstants(10, 0, 0);
+        //TODO, check if changing the PID to (20, 0, 0.2) works
+        PIDConstants translationConstants = new PIDConstants(5, 0, 0);
         PIDConstants rotationConstants = new PIDConstants(5, 0, 0);
 
         PPHolonomicDriveController autoController = new PPHolonomicDriveController(translationConstants, rotationConstants);
