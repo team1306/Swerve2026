@@ -36,7 +36,6 @@ public class ControllerMappings {
         drivetrain.setDefaultCommand(controls.getDrivetrainFieldCentricCommand());
 
         driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-        driverController.a().whileTrue(drivetrain.applyRequest(() -> controls.brake));
     }
 
     public void bindSwerveTestingControls() {
@@ -45,7 +44,6 @@ public class ControllerMappings {
 
         drivetrain.setDefaultCommand(controls.getDrivetrainFieldCentricCommand());
         
-        driverController.a().whileTrue(drivetrain.applyRequest(() -> controls.brake));
         driverController.b().whileTrue(drivetrain.applyRequest(() ->
                 controls.point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))
         ));
