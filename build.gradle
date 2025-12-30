@@ -108,3 +108,52 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+eclipse {
+    classpath {
+        defaultOutputDir = file('build/classes/java/main')
+
+        file {
+            whenMerged { classpath ->
+                // Remove all bin/ output entries
+                classpath.entries.removeAll { entry ->
+                    entry instanceof org.gradle.plugins.ide.eclipse.model.Output &&
+                            entry.path == 'bin'
+                }
+
+                // Fix source entries that have bin/main output
+                classpath.entries.each { entry ->
+                    if (entry instanceof org.gradle.plugins.ide.eclipse.model.SourceFolder) {
+                        entry.output = null  // Use default output instead
+                    }
+                }
+            }
+
+            withXml { provider ->
+                def node = provider.asNode()
+
+                // Remove bin/ output classpathentry
+                node.classpathentry.findAll {
+                    it.@kind == 'output' && it.@path == 'bin'
+                }.each { node.remove(it) }
+
+                // Remove output="bin/main" attributes from source entries
+                node.classpathentry.findAll {
+                    it.@kind == 'src' && it.@output != null
+                }.each {
+                    it.attributes().remove('output')
+                }
+
+                // Ensure correct default output exists
+                if (!node.classpathentry.find {
+                    it.@kind == 'output' && it.@path == 'build/classes/java/main'
+                }) {
+                    node.appendNode('classpathentry', [
+                            kind: 'output',
+                            path: 'build/classes/java/main'
+                    ])
+                }
+            }
+        }
+    }
+}
