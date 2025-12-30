@@ -111,49 +111,47 @@ tasks.withType(JavaCompile) {
 
 eclipse {
     classpath {
-        defaultOutputDir = file('build/classes/java/main')
-
         file {
             whenMerged { classpath ->
-                // Remove all bin/ output entries
                 classpath.entries.removeAll { entry ->
-                    entry instanceof org.gradle.plugins.ide.eclipse.model.Output &&
-                            entry.path == 'bin'
+                    entry instanceof org.gradle.plugins.ide.eclipse.model.SourceFolder && 
+                    entry.path == 'src/main/java'
                 }
-
-                // Fix source entries that have bin/main output
-                classpath.entries.each { entry ->
-                    if (entry instanceof org.gradle.plugins.ide.eclipse.model.SourceFolder) {
-                        entry.output = null  // Use default output instead
-                    }
+                
+                classpath.entries.removeAll { entry ->
+                    entry instanceof org.gradle.plugins.ide.eclipse.model.SourceFolder && 
+                    entry.path == 'build/generated/sources/annotationProcessor/java/main'
                 }
-            }
-
-            withXml { provider ->
-                def node = provider.asNode()
-
-                // Remove bin/ output classpathentry
-                node.classpathentry.findAll {
-                    it.@kind == 'output' && it.@path == 'bin'
-                }.each { node.remove(it) }
-
-                // Remove output="bin/main" attributes from source entries
-                node.classpathentry.findAll {
-                    it.@kind == 'src' && it.@output != null
-                }.each {
-                    it.attributes().remove('output')
+                
+                classpath.entries.removeAll { entry ->
+                    entry instanceof org.gradle.plugins.ide.eclipse.model.Container
                 }
-
-                // Ensure correct default output exists
-                if (!node.classpathentry.find {
-                    it.@kind == 'output' && it.@path == 'build/classes/java/main'
-                }) {
-                    node.appendNode('classpathentry', [
-                            kind: 'output',
-                            path: 'build/classes/java/main'
-                    ])
-                }
+                
+                def srcEntry = new org.gradle.plugins.ide.eclipse.model.SourceFolder('src/main/java', 'build/classes/java/main')
+                srcEntry.entryAttributes['gradle_scope'] = 'main'
+                srcEntry.entryAttributes['gradle_used_by_scope'] = 'main,test'
+                classpath.entries.add(0, srcEntry)
+                
+                def genSrcEntry = new org.gradle.plugins.ide.eclipse.model.SourceFolder(
+                    'build/generated/sources/annotationProcessor/java/main', 
+                    null
+                )
+                classpath.entries.add(1, genSrcEntry)
+                
+                classpath.entries.add(new org.gradle.plugins.ide.eclipse.model.Container(
+                    'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17/'
+                ))
+                
+                classpath.entries.add(new org.gradle.plugins.ide.eclipse.model.Container(
+                    'org.eclipse.buildship.core.gradleclasspathcontainer'
+                ))
             }
         }
+        
+        defaultOutputDir = file('build/classes/java/main')
     }
+}
+
+tasks.named('simulateExternalJavaRelease') {
+    dependsOn 'eclipse'
 }
