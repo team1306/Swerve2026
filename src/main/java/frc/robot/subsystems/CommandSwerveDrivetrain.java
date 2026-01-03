@@ -28,6 +28,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -170,42 +171,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    //This method is for testing driving to a pose. On the real robot, it would also decide the pose (like picking the nearest reef pose)
     public Command getDriveToExamplePoseCommand() {
         Pose2d testPose = new Pose2d(1, 1,  Rotation2d.fromDegrees(0));
-        return getPathFollowingCommand(testPose);
+
+        // Create the constraints to use while pathfinding
+        PathConstraints constraints = new PathConstraints(
+                5.0, 0.5,
+                Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+        return getPathFollowingCommand(testPose, constraints);
     }
 
-    private Command getPathFollowingCommand(Pose2d goalPose) {
-        return AutoBuilder.followPath(createPathToPose(goalPose));
-    }
-
-    public PathPlannerPath createPathToPose(Pose2d pose) {
-        // Create a list of waypoints from poses. Each pose represents one waypoint.
-        // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
-        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-                getState().Pose, //the starting direction of travel should be the current rotation?
-                pose
+    public Command getPathFollowingCommand(Pose2d pose, PathConstraints constraints) {
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        Command pathfindingCommand = AutoBuilder.pathfindToPose(
+            pose,
+            constraints,
+            0.0 // Goal end velocity in meters/sec
         );
 
-        PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
-        // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
-
-        // Create the path using the waypoints created above
-        PathPlannerPath path = new PathPlannerPath(
-                waypoints,
-                constraints,
-                null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-        );
-
-        // Prevent the path from being flipped if the coordinates are already correct
-        path.preventFlipping = false;
-
-        return path;
-    }
-
-    public void applyChassisSpeeds(ChassisSpeeds speeds) {
-        setControl(new ApplyRobotSpeeds().withSpeeds(speeds));
+        return pathfindingCommand;
     }
 
     /**
