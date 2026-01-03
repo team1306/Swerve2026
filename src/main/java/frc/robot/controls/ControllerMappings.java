@@ -56,6 +56,8 @@ public class ControllerMappings {
         driverController.start().and(driverController.b()).onTrue(new InstantCommand(SignalLogger::stop));
 
         driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric).ignoringDisable(true));
+
+        driverController.leftStick().whileTrue(drivetrain.getDriveToExamplePoseCommand());
     }
 
     public void bindCommonControls() {
