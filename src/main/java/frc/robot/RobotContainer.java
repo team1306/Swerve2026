@@ -18,12 +18,14 @@ import frc.robot.controls.Controls;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeIOPhoenix6;
 
 public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+    public final Intake intake = new Intake(new IntakeIOPhoenix6());
     public final Controls controls;
     
     public final Autos autos;
@@ -49,7 +51,7 @@ public class RobotContainer {
     new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(135)))); 
    
     public RobotContainer() {
-        controls = new Controls(drivetrain);
+        controls = new Controls(drivetrain, intake);
         autos = new Autos(drivetrain);
         
         configureBindings();

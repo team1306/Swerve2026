@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake.Intake;
 
 import java.util.EnumMap;
 
@@ -25,6 +26,7 @@ public class Controls {
     
     //============================== SUBSYSTEMS ====================================
     private final CommandSwerveDrivetrain drivetrain;
+    private final Intake intake;
 
     
     //============================== CONTROLLERS ===================================
@@ -37,14 +39,15 @@ public class Controls {
     private final EnumMap<ControlStates, Runnable> states = new EnumMap<>(ControlStates.class);
     private final ControllerMappings mappings;
     
-    public Controls(CommandSwerveDrivetrain drivetrain) {
+    public Controls(CommandSwerveDrivetrain drivetrain, Intake intake) {
         this.drivetrain = drivetrain;
-        
+        this.intake = intake;
+     
         DriverStation.silenceJoystickConnectionWarning(true);
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
         
-        this.mappings = new ControllerMappings(this, drivetrain, driverController, operatorController);
+        this.mappings = new ControllerMappings(this, drivetrain, driverController, operatorController, intake);
 
         mappings.bindDefaultControls();
         

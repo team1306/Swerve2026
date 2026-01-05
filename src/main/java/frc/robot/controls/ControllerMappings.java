@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake.Intake;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -21,12 +22,15 @@ public class ControllerMappings {
     private final CommandSwerveDrivetrain drivetrain;
     private final CommandXboxController driverController;
     private final CommandXboxController operatorController;
+    private final Intake intake;
 
-    public ControllerMappings(Controls controls, CommandSwerveDrivetrain drivetrain, CommandXboxController driverController, CommandXboxController operatorController) {
+    public ControllerMappings(Controls controls, CommandSwerveDrivetrain drivetrain, CommandXboxController driverController, CommandXboxController operatorController, Intake intake) {
         this.controls = controls;
         this.drivetrain = drivetrain;
         this.driverController = driverController;
         this.operatorController = operatorController;
+        this.intake = intake;
+    
     }
 
     public void bindDefaultControls() {
@@ -36,6 +40,9 @@ public class ControllerMappings {
         drivetrain.setDefaultCommand(controls.getDrivetrainFieldCentricCommand());
 
         driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+
+        intake.setDefaultCommand(intake.runPercent(() -> operatorController.getLeftTriggerAxis()));
+       
     }
 
     public void bindSwerveTestingControls() {
