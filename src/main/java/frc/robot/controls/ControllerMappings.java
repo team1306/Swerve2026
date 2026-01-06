@@ -41,7 +41,7 @@ public class ControllerMappings {
 
         driverController.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        intake.setDefaultCommand(intake.runPercent(() -> operatorController.getLeftTriggerAxis()));
+       intake.setDefaultCommand(intake.runPercent( ()-> driverController.getLeftTriggerAxis()));
        
     }
 

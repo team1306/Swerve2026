@@ -47,7 +47,7 @@ public class Controls {
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
         
-        this.mappings = new ControllerMappings(this, drivetrain, driverController, operatorController, intake);
+        this.mappings = new ControllerMappings(this, drivetrain, driverController, operatorController, this.intake);
 
         mappings.bindDefaultControls();
         

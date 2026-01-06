@@ -11,6 +11,7 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.autos.Autos;
@@ -19,13 +20,13 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.Intake.IntakeIOPhoenix6;
+import frc.robot.subsystems.Intake.IntakeIOTalonFX;
 
 public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
     
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    public final Intake intake = new Intake(new IntakeIOPhoenix6());
+    public final Intake intake = new Intake(new IntakeIOTalonFX());
     public final Controls controls;
     
     public final Autos autos;
@@ -55,6 +56,7 @@ public class RobotContainer {
         autos = new Autos(drivetrain);
         
         configureBindings();
+        SmartDashboard.putData("Turn on intake", intake.runPercent(() -> 1.0));
         
         SignalLogger.enableAutoLogging(true);
     }
