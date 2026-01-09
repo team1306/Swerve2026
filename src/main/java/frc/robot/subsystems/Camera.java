@@ -39,7 +39,7 @@ public class Camera extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
  
-    public final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.5);
     public final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
     private Matrix<N3, N1> curStdDevs;
 
@@ -49,6 +49,8 @@ public class Camera extends SubsystemBase {
     private PhotonCameraSim cameraSim;
     private VisionSystemSim visionSim;
     private CommandSwerveDrivetrain drivetrain;
+
+    private Pose2d estPose2d = Pose2d.kZero;
 
     /**
      * @param drivetrain Drivetrain instance, used for updating camera simulation
@@ -118,6 +120,8 @@ public class Camera extends SubsystemBase {
                         DogLog.log("Cameras/" + camera.getName(),  est.estimatedPose);
                        
                         estConsumer.accept(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        
+                        
                     });
         }
     }

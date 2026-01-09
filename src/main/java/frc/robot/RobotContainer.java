@@ -36,7 +36,7 @@ public class RobotContainer {
     private final Camera frontRightCamera = 
     new Camera(drivetrain, drivetrain::addVisionMeasurement, "frontRight", 
     new Transform3d(0.307325, -0.307325, 0.215781, 
-    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(-45)))); 
+    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(-45))));
 
     private final Camera backLeftCamera = 
     new Camera(drivetrain, drivetrain::addVisionMeasurement, "backLeft", 
