@@ -7,6 +7,7 @@ package frc.robot;
 import static frc.robot.subsystems.CommandSwerveDrivetrain.MaxSpeed;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -41,12 +42,12 @@ public class RobotContainer {
     private final Camera backLeftCamera = 
     new Camera(drivetrain, drivetrain::addVisionMeasurement, "backLeft", 
     new Transform3d(-0.307325, 0.307325, 0.215781, 
-    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(-135)))); 
+    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(135)))); 
 
     private final Camera backRightCamera = 
     new Camera(drivetrain, drivetrain::addVisionMeasurement, "backRight", 
     new Transform3d(-0.307325, -0.307325, 0.215781, 
-    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(135)))); 
+    new Rotation3d(0, Units.degreesToRadians(-45),  Units.degreesToRadians(-135)))); 
    
     public RobotContainer() {
         controls = new Controls(drivetrain);
@@ -62,6 +63,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autos.createAutoCommand();
+        return AutoBuilder.buildAuto("Approach Processer");
+        //return autos.createAutoCommand();
     }
 }

@@ -39,8 +39,8 @@ public class Camera extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator photonEstimator;
  
-    public final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.5);
-    public final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    public final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 1);
+    public final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 0.5);
     private Matrix<N3, N1> curStdDevs;
 
     public final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
