@@ -23,6 +23,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -122,6 +123,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // =================================================
 
     private void configurePathPlanner() {
+
         RobotConfig config;
         try{
             config = RobotConfig.fromGUISettings();

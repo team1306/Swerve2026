@@ -3,10 +3,12 @@
   "robotLength": 0.75,
   "holonomicMode": true,
   "pathFolders": [
-    "Distance Testing"
+    "Distance Testing",
+    "Vision Testing"
   ],
   "autoFolders": [
-    "Distance Testing"
+    "Distance Testing",
+    "Vision Testing"
   ],
   "defaultMaxVel": 5.0,
   "defaultMaxAccel": 0.5,
